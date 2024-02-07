@@ -8,6 +8,7 @@ const port = 8080;
 require("dotenv").config();
 app.use(cors());
 
+const YEARS = [2021, 2022, 2023];
 let GSHEET_DATA = [];
 
 app.listen(port, () => {
@@ -18,11 +19,13 @@ app.listen(port, () => {
 async function initializeExpressServer() {
 	let csvData;
 	try {
-		csvData = await axios.get("https://sheets.googleapis.com/v4/spreadsheets/" + process.env.GSHEET_ID + "/values/2021?alt=json&key=" + process.env.GSHEET_API_KEY);
+		for (let i = 0; i < YEARS.length; i++) {
+			csvData = await axios.get("https://sheets.googleapis.com/v4/spreadsheets/" + process.env.GSHEET_ID + "/values/" + YEARS[i] + "?alt=json&key=" + process.env.GSHEET_API_KEY);
+			GSHEET_DATA = GSHEET_DATA.concat(gsheetRows2Objects(csvData.data.values));
+		}
 	} catch (e) {
 		console.log(e);
 	}
-	GSHEET_DATA = GSHEET_DATA.concat(gsheetRows2Objects(csvData.data.values));
 }
 
 
