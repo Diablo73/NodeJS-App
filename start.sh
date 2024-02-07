@@ -25,9 +25,9 @@ echo
 	removeTempFileFolder node_modules
 } &&
 {
-	{
+	# {
 		cd backend/ && npm run start
-	} & 
+	# } & 
 	# {
 	# 	cd frontend/ && npm run start
 	# }

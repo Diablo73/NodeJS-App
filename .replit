@@ -56,7 +56,7 @@
 #     [debugger.interactive.launchMessage]
 #     command = "launch"
 #     type = "request"
-    
+
 #       [debugger.interactive.launchMessage.arguments]  
 #       args = []
 #       console = "externalTerminal"
@@ -111,8 +111,8 @@ language = "nodejs"
 [languages]
   [languages.javascript]
   pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
-    [languages.javascript.languageServer]
-    start = "typescript-language-server --stdio"
+	[languages.javascript.languageServer]
+	start = "typescript-language-server --stdio"
 
 [deployment]
 build = ["sh", "-c", "npm run build"]
