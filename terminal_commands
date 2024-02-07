@@ -1,0 +1,7 @@
+npm i express cors dotenv nodemon
+npm cache clean --force
+npx create-react-app frontend
+npm i axios
+npm install http-proxy-middleware --save
+npm install csv-parser
+npm install console-browserify
