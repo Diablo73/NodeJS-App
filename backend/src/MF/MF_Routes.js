@@ -5,12 +5,15 @@ const MF_Utils = require("./MF_Utils");
 
 
 router.get("/", (req, res) => {
-	res.send("Analysis of mutual funds on Zerodha Coin app...");
+	res.send(process.env.SAMPLE_DATA ? process.env.SAMPLE_DATA : "Analysis of mutual funds on Zerodha Coin app...");
+});
+
+router.get("/test", (req, res) => {
+	res.send(MF_Utils.get_FUND_WISE_DATA());
 });
 
 router.get("/refreshGSheetData", (req, res) => {
 	MF_Utils.initializeMFExpressServer();
-	// res.send(MF_Utils.get_GSHEET_DATA());
 });
 
 router.get("/fdComparison/:ROI", (req, res) => {
