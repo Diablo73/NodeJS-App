@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/test", (req, res) => {
-	res.send(MF_Utils.get_FUND_WISE_DATA());
+	res.send(process.env.SAMPLE_DATA ? MF_Utils.get_FUND_WISE_DATA() : "Testing endpoint for the analysis of mutual funds on Zerodha Coin app...");
 });
 
 router.get("/refreshGSheetData", (req, res) => {
