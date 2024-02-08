@@ -43,7 +43,7 @@ function fdComparison(roi) {
 		const response = {
 			"totalSimpleInterest": totalSimpleInterest.toFixed(2),
 			"totalCompoundInterest": totalCompoundInterest.toFixed(2),
-			"totalPrinciple": totalPrinciple.toFixed(2)
+			"totalPrincipleAmount": totalPrinciple.toFixed(2)
 		};
 		return response;
 	} else {

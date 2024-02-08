@@ -13,7 +13,7 @@ router.get("/refreshGSheetData", (req, res) => {
 	// res.send(MF_Utils.get_GSHEET_DATA());
 });
 
-router.get("/FDComparison/:ROI", (req, res) => {
+router.get("/fdComparison/:ROI", (req, res) => {
 	const roi = req.params.ROI
 	res.send(MF_Utils.fdComparison(roi));
 });

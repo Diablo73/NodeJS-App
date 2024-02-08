@@ -12,7 +12,7 @@ const Utils = require("./src/Utils");
 const MF_Routes = require("./src/MF/MF_Routes");
 const MF_Utils = require("./src/MF/MF_Utils");
 
-app.use("/MF", MF_Routes);
+app.use("/api/MF", MF_Routes);
 
 app.listen(port, () => {
 	MF_Utils.initializeMFExpressServer();
