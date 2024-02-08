@@ -29,9 +29,9 @@ function FdComparison({ roi, fdComparison, setFdComparison }) {
 					style={{width:"500px"}}
 					columnsConfig="300px 50px 150px"
 					data={[
-						[ "Total Principle Amount", "|", "₹ " + fdComparison.totalPrincipleAmount ],
-						[ "Total Simple Interest", "|", "₹ " + fdComparison.totalSimpleInterest ],
-						[ "Total Compound Interest", "|", "₹ " + fdComparison.totalCompoundInterest ],
+						[ "Total Principle Amount", "|", "₹ " + parseFloat(fdComparison.totalPrincipleAmount).toLocaleString("en-IN") ],
+						[ "Total Simple Interest", "|", "₹ " + parseFloat(fdComparison.totalSimpleInterest).toLocaleString("en-IN") ],
+						[ "Total Compound Interest", "|", "₹ " + parseFloat(fdComparison.totalCompoundInterest).toLocaleString("en-IN") ],
 					]}
 					header={[]}
 				/>
