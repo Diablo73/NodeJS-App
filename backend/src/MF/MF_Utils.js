@@ -7,6 +7,7 @@ let GSHEET_DATA = [];
 let FUND_WISE_DATA = {};
 let LONG_TERM_FUND_SUM_DATA = [];
 let SHORT_TERM_FUND_SUM_DATA = [];
+let LTST_FUND_SUM_DATA = {};
 
 function get_GSHEET_DATA() {
 	return GSHEET_DATA;
@@ -22,6 +23,10 @@ function get_LONG_TERM_FUND_SUM_DATA() {
 
 function get_SHORT_TERM_FUND_SUM_DATA() {
 	return SHORT_TERM_FUND_SUM_DATA;
+}
+
+function get_LTST_FUND_SUM_DATA() {
+	return LTST_FUND_SUM_DATA;
 }
 
 async function initializeMFExpressServer() {
@@ -64,33 +69,40 @@ function initialize_FUND_WISE_DATA() {
 function initialize_LS_TERM_FUND_SUM_DATA() {
 	LONG_TERM_FUND_SUM_DATA = [];
 	SHORT_TERM_FUND_SUM_DATA = [];
+	LTST_FUND_SUM_DATA = {};
 	try {
 		for (var key in FUND_WISE_DATA) {
 			const fundIsinList = FUND_WISE_DATA[key];
 			let sumData = { "isin" : key , "symbol" : fundIsinList[0]["symbol"]};
 			const todayDate = Utils.getNewDate();
-			let ltFundQuantity = 0;
-			let ltFundAmount = 0;
-			let stFundQuantity = 0;
-			let stFundAmount = 0;
+			let longTermFundQuantity = 0;
+			let longTermFundAmount = 0;
+			let shortTermFundQuantity = 0;
+			let shortTermFundAmount = 0;
 			for (var i = 0; i < fundIsinList.length; i++) {
 				if (todayDate - new Date(fundIsinList[i]["trade_date"]) > 1000 * 60 * 60 * 24 * 365) {
-					ltFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
-					ltFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
+					longTermFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
+					longTermFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
 				} else {
-					stFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
-					stFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
+					shortTermFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
+					shortTermFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
 				}
 			}
 			
-			if (ltFundQuantity !== 0) {
-				const ltFundSumData = Object.assign({ quantity: ltFundQuantity, investedAmount: ltFundAmount }, sumData);
+			if (longTermFundQuantity !== 0) {
+				const ltFundSumData = Object.assign({ quantity: longTermFundQuantity, investedAmount: longTermFundAmount }, sumData);
 				LONG_TERM_FUND_SUM_DATA.push(ltFundSumData);
 			}
-			if (stFundQuantity !== 0) {
-				const stFundSumData = Object.assign({ quantity: stFundQuantity, investedAmount: stFundAmount }, sumData);
+			if (shortTermFundQuantity !== 0) {
+				const stFundSumData = Object.assign({ quantity: shortTermFundQuantity, investedAmount: shortTermFundAmount }, sumData);
 				SHORT_TERM_FUND_SUM_DATA.push(stFundSumData);
 			}
+			LTST_FUND_SUM_DATA[sumData["isin"]] = Object.assign({
+				longTermFundQuantity : longTermFundQuantity,
+				longTermFundAmount : longTermFundAmount,
+				shortTermFundQuantity : shortTermFundQuantity,
+				shortTermFundAmount : shortTermFundAmount
+			}, sumData);
 		} 
 	} catch (e) {
 		console.log(e);
@@ -132,6 +144,7 @@ module.exports = {
 	get_FUND_WISE_DATA,
 	get_LONG_TERM_FUND_SUM_DATA,
 	get_SHORT_TERM_FUND_SUM_DATA,
+	get_LTST_FUND_SUM_DATA,
 	initializeMFExpressServer,
 	fdComparison
 };

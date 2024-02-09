@@ -15,7 +15,7 @@ function PortfolioSummary({ roi, fdComparison, setFdComparison, ltstSummary, set
 	}
 
 	async function getLtStComparisonAPI() {
-		const response = await axios.get(window.location.origin + "/api/MF/ltst");
+		const response = await axios.get(window.location.origin + "/api/MF/v2/ltst");
 		console.log("ltst : " + JSON.stringify(response));
 
 		setLtstSummary(response.data);
