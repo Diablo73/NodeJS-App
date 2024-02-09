@@ -21,5 +21,13 @@ router.get("/fdComparison/:ROI", (req, res) => {
 	res.send(MF_Utils.fdComparison(roi));
 });
 
+router.get("/ltst", (req, res) => {
+	res.send({
+		"longTermFundList" : MF_Utils.get_LONG_TERM_FUND_SUM_DATA(),
+		"shortTermFundList" : MF_Utils.get_SHORT_TERM_FUND_SUM_DATA(),
+		"longTermInvestedAmount" : MF_Utils.get_LONG_TERM_FUND_SUM_DATA().reduce((investedAmount, fund) => investedAmount + fund.investedAmount, 0),
+		"shortTermInvestedAmount" : MF_Utils.get_SHORT_TERM_FUND_SUM_DATA().reduce((investedAmount, fund) => investedAmount + fund.investedAmount, 0)
+	});
+});
 
 module.exports = router;

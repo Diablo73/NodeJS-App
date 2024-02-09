@@ -27,10 +27,18 @@ function gsheetRows2Objects(rowList) {
 	return dataObjectList;
 }
 
+function getNewDate() {
+	const todayDate = new Date();
+	todayDate.setUTCHours(todayDate.getUTCHours() + 5, 30, 0, 0);
+	todayDate.setUTCHours(0, 0, 0, 0);
+	return todayDate;
+}
+
 
 module.exports = {
 	isNumeric,
 	calculateSimpleInterest,
 	calculateCompoundInterest,
-	gsheetRows2Objects
+	gsheetRows2Objects,
+	getNewDate
 };

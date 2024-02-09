@@ -2,8 +2,11 @@ const axios = require("axios");
 const Utils = require("../Utils");
 
 const YEARS = ["2021-22", "2022-23", "2023-24"];
+// const YEARS = ["2021-22"];
 let GSHEET_DATA = [];
 let FUND_WISE_DATA = {};
+let LONG_TERM_FUND_SUM_DATA = [];
+let SHORT_TERM_FUND_SUM_DATA = [];
 
 function get_GSHEET_DATA() {
 	return GSHEET_DATA;
@@ -13,9 +16,18 @@ function get_FUND_WISE_DATA() {
 	return FUND_WISE_DATA;
 }
 
+function get_LONG_TERM_FUND_SUM_DATA() {
+	return LONG_TERM_FUND_SUM_DATA;
+}
+
+function get_SHORT_TERM_FUND_SUM_DATA() {
+	return SHORT_TERM_FUND_SUM_DATA;
+}
+
 async function initializeMFExpressServer() {
 	await initialize_GSHEET_DATA();
 	initialize_FUND_WISE_DATA();
+	initialize_LS_TERM_FUND_SUM_DATA();
 }
 
 async function initialize_GSHEET_DATA() {
@@ -49,14 +61,49 @@ function initialize_FUND_WISE_DATA() {
 	// console.log(FUND_WISE_DATA);
 }
 
+function initialize_LS_TERM_FUND_SUM_DATA() {
+	LONG_TERM_FUND_SUM_DATA = [];
+	SHORT_TERM_FUND_SUM_DATA = [];
+	try {
+		for (var key in FUND_WISE_DATA) {
+			const fundIsinList = FUND_WISE_DATA[key];
+			let sumData = { "isin" : key , "symbol" : fundIsinList[0]["symbol"]};
+			const todayDate = Utils.getNewDate();
+			let ltFundQuantity = 0;
+			let ltFundAmount = 0;
+			let stFundQuantity = 0;
+			let stFundAmount = 0;
+			for (var i = 0; i < fundIsinList.length; i++) {
+				if (todayDate - new Date(fundIsinList[i]["trade_date"]) > 1000 * 60 * 60 * 24 * 365) {
+					ltFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
+					ltFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
+				} else {
+					stFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
+					stFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
+				}
+			}
+			
+			if (ltFundQuantity !== 0) {
+				const ltFundSumData = Object.assign({ quantity: ltFundQuantity, investedAmount: ltFundAmount }, sumData);
+				LONG_TERM_FUND_SUM_DATA.push(ltFundSumData);
+			}
+			if (stFundQuantity !== 0) {
+				const stFundSumData = Object.assign({ quantity: stFundQuantity, investedAmount: stFundAmount }, sumData);
+				SHORT_TERM_FUND_SUM_DATA.push(stFundSumData);
+			}
+		} 
+	} catch (e) {
+		console.log(e);
+	}
+	// console.log(FUND_WISE_DATA);
+}
+
 function fdComparison(roi) {
 	if (Utils.isNumeric(roi)) {
 		let totalPrinciple = 0;
 		let totalSimpleInterest = 0;
 		let totalCompoundInterest = 0;
-		const todayDate = new Date();
-		todayDate.setUTCHours(todayDate.getUTCHours() + 5, 30, 0, 0);
-		todayDate.setUTCHours(0, 0, 0, 0);
+		const todayDate = Utils.getNewDate();
 		GSHEET_DATA.forEach(function(obj) {
 			let principle = parseFloat(obj.quantity) * parseFloat(obj.price);
 			let tradeDate = new Date(obj.trade_date);
@@ -83,6 +130,8 @@ function fdComparison(roi) {
 module.exports = {
 	get_GSHEET_DATA,
 	get_FUND_WISE_DATA,
+	get_LONG_TERM_FUND_SUM_DATA,
+	get_SHORT_TERM_FUND_SUM_DATA,
 	initializeMFExpressServer,
 	fdComparison
 };
