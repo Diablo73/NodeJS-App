@@ -17,7 +17,7 @@ function LTST({}) {
 		var ltstFundTableList = response.data.ltstFundTableList;
 
 		ltstFundTableList.forEach(function(row) {
-			row[1] = row[3].toFixed(1);
+			row[1] = row[1].toFixed(3);
 			row[2] = "₹ " + parseFloat(row[2]).toFixed(2).toLocaleString("en-IN");
 			row[3] = row[3].toFixed(3);
 			row[4] = "₹ " + parseFloat(row[4]).toFixed(2).toLocaleString("en-IN");
