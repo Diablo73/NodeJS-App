@@ -3,6 +3,7 @@ import axios from "axios";
 import { Table } from "@web3uikit/core";
 import { Reload } from "@web3uikit/icons";
 var console = require("console-browserify");
+
 let ROI = 0;
 
 function PortfolioSummary({ roi, fdComparison, setFdComparison, ltstSummary, setLtstSummary }) {
@@ -16,7 +17,7 @@ function PortfolioSummary({ roi, fdComparison, setFdComparison, ltstSummary, set
 
 	async function getLtStComparisonAPI() {
 		const response = await axios.get(window.location.origin + "/api/MF/v2/ltst");
-		console.log("ltst : " + JSON.stringify(response));
+		// console.log("ltst : " + JSON.stringify(response));
 
 		setLtstSummary(response.data);
 	}
@@ -24,6 +25,7 @@ function PortfolioSummary({ roi, fdComparison, setFdComparison, ltstSummary, set
 	if (ROI !== roi) {
 		ROI = roi;
 		getFdComparisonAPI();
+		getLtStComparisonAPI();
 	}
 
 	return (

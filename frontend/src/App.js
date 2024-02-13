@@ -2,7 +2,8 @@ import "./App.css";
 import { useState } from "react";
 import HeaderBar from "./components/HeaderBar";
 import PortfolioSummary from "./components/PortfolioSummary";
-import { Avatar, TabList, Tab } from "@web3uikit/core";
+import LTST from "./components/LTST";
+import { TabList, Tab } from "@web3uikit/core";
 
 function App() {
 
@@ -31,15 +32,11 @@ function App() {
 							setLtstSummary={setLtstSummary}
 						/>
 					</Tab>
-					{/* <Tab tabKey={2} tabName={"Transfers"}>
-						<TransferHistory 
-							chain={chain} 
-							wallet={wallet}
-							transfers={transfers}
-							setTransfers={setTransfers}
+					<Tab tabKey={2} tabName={"LTST"}>
+						<LTST 
 						/>
 					</Tab>
-					<Tab tabKey={3} tabName={"NFT's"}>
+					{/* <Tab tabKey={3} tabName={"NFT's"}>
 						<Nfts 
 							wallet={wallet} 
 							chain={chain}
