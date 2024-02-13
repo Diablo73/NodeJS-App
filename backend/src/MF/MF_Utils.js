@@ -138,6 +138,31 @@ function fdComparison(roi) {
 	}
 }
 
+function getV2Ltst() {
+	var tableRows = [];
+
+	Object.keys(LTST_FUND_SUM_DATA).forEach(function(isin) {
+		const fundObj = LTST_FUND_SUM_DATA[isin];
+		tableRows.push([
+			fundObj.symbol,
+			fundObj.longTermFundQuantity,
+			fundObj.longTermFundAmount,
+			fundObj.shortTermFundQuantity,
+			fundObj.shortTermFundAmount
+		])
+	});
+
+	tableRows = tableRows.sort((rowA, rowB) => {
+		if (rowA[2] === rowB[2]) {
+			return rowB[4] - rowA[4];
+		} else {
+			return rowB[2] - rowA[2];
+		}
+	});
+
+	return tableRows;
+}
+
 
 module.exports = {
 	get_GSHEET_DATA,
@@ -146,5 +171,6 @@ module.exports = {
 	get_SHORT_TERM_FUND_SUM_DATA,
 	get_LTST_FUND_SUM_DATA,
 	initializeMFExpressServer,
-	fdComparison
+	fdComparison,
+	getV2Ltst
 };

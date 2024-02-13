@@ -32,7 +32,7 @@ router.get("/v1/ltst", (req, res) => {
 
 router.get("/v2/ltst", (req, res) => {
 	res.send({
-		"ltstFundList" : MF_Utils.get_LTST_FUND_SUM_DATA(),
+		"ltstFundTableList" : MF_Utils.getV2Ltst(),
 		"longTermInvestedAmount" : Object.keys(MF_Utils.get_LTST_FUND_SUM_DATA()).reduce((investedAmount, isin) => {
 			const fundObject = MF_Utils.get_LTST_FUND_SUM_DATA()[isin];
 			if (fundObject.longTermFundQuantity !== 0) {
