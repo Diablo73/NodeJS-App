@@ -47,13 +47,14 @@ function LTST({}) {
 				LTST Portfolio <Reload onClick={updateLtstFundTable} />
 			</div>
 			<Table
-					pageSize={1}
-					noPagination={true}
-					style={{width:"1200px"}}
-					columnsConfig="400px 150px 150px 150px 150px"
-					data={ltstFundTable}
-					header={["FUND", "LONG-TERM QUANTITY", "LONG-TERM AMOUNT", "SHORT-TERM QUANTITY", "SHORT-TERM AMOUNT"]}
-				/>
+				pageSize={1}
+				noPagination={true}
+				style={{width:"1200px"}}
+				columnsConfig="400px 150px 150px 150px 150px"
+				data={ltstFundTable}
+				header={["FUND", "LONG-TERM QUANTITY", "LONG-TERM AMOUNT", "SHORT-TERM QUANTITY", "SHORT-TERM AMOUNT"]}
+			>
+			</Table>
 		</>
 	)
 }

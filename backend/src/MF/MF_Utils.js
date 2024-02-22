@@ -5,6 +5,7 @@ const YEARS = ["2021-22", "2022-23", "2023-24"];
 // const YEARS = ["2021-22"];
 let GSHEET_DATA = [];
 let FUND_WISE_DATA = {};
+let FILTERED_FUND_WISE_DATA = {};
 let LONG_TERM_FUND_SUM_DATA = [];
 let SHORT_TERM_FUND_SUM_DATA = [];
 let LTST_FUND_SUM_DATA = {};
@@ -15,6 +16,10 @@ function get_GSHEET_DATA() {
 
 function get_FUND_WISE_DATA() {
 	return FUND_WISE_DATA;
+}
+
+function get_FILTERED_FUND_WISE_DATA() {
+	return FILTERED_FUND_WISE_DATA;
 }
 
 function get_LONG_TERM_FUND_SUM_DATA() {
@@ -32,6 +37,7 @@ function get_LTST_FUND_SUM_DATA() {
 async function initializeMFExpressServer() {
 	await initialize_GSHEET_DATA();
 	initialize_FUND_WISE_DATA();
+	initialize_FILTERED_FUND_WISE_DATA();
 	initialize_LS_TERM_FUND_SUM_DATA();
 }
 
@@ -55,11 +61,44 @@ function initialize_FUND_WISE_DATA() {
 	try {
 		for (let i = 0; i < GSHEET_DATA.length; i++) {
 			if (FUND_WISE_DATA.hasOwnProperty(GSHEET_DATA[i]["isin"])) {
-				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]] = FUND_WISE_DATA[GSHEET_DATA[i]["isin"]].concat(GSHEET_DATA[i]);
+				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]]["orderList"] = FUND_WISE_DATA[GSHEET_DATA[i]["isin"]]["orderList"].concat(GSHEET_DATA[i]);
 			} else {
-				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]] = [GSHEET_DATA[i]];
+				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]] = {"orderList" : [GSHEET_DATA[i]]};
 			}
 		}
+	} catch (e) {
+		console.log(e);
+	}
+	// console.log(FUND_WISE_DATA);
+}
+
+function initialize_FILTERED_FUND_WISE_DATA() {
+	FILTERED_FUND_WISE_DATA = Utils.deepClone(FUND_WISE_DATA);
+	try {
+		Object.keys(FILTERED_FUND_WISE_DATA).forEach(function(isin) {
+			let fundObj = FILTERED_FUND_WISE_DATA[isin];
+			let sellQuantity = 0;
+			for (let i = 0; i < fundObj["orderList"].length; i++) {
+				const txn = fundObj["orderList"][i];
+				if (txn["trade_type"] == "sell") {
+					sellQuantity += parseFloat(txn["quantity"]);
+				}
+			}
+			let i = 0;
+			while (i < fundObj["orderList"].length) {
+				let txn = fundObj["orderList"][i];
+				if (txn["trade_type"] === "sell") {
+					fundObj["orderList"].splice(i, 1);
+				} else if (sellQuantity >= txn["quantity"] && txn["trade_type"] === "buy") {
+					sellQuantity -= parseFloat(txn["quantity"]);
+					fundObj["orderList"].splice(i, 1);
+				} else if (sellQuantity >= 0 && txn["trade_type"] == "buy") {
+					txn["quantity"] = (parseFloat(txn["quantity"] - sellQuantity).toFixed(3)).toString();
+					sellQuantity = 0;
+					i++;
+				}
+			}
+		});
 	} catch (e) {
 		console.log(e);
 	}
@@ -71,21 +110,21 @@ function initialize_LS_TERM_FUND_SUM_DATA() {
 	SHORT_TERM_FUND_SUM_DATA = [];
 	LTST_FUND_SUM_DATA = {};
 	try {
-		for (var key in FUND_WISE_DATA) {
-			const fundIsinList = FUND_WISE_DATA[key];
-			let sumData = { "isin" : key , "symbol" : fundIsinList[0]["symbol"]};
+		for (var key in FILTERED_FUND_WISE_DATA) {
+			const fundOrderList = FILTERED_FUND_WISE_DATA[key].orderList;
+			let sumData = { "isin" : key , "symbol" : fundOrderList[0]["symbol"]};
 			const todayDate = Utils.getNewDate();
 			let longTermFundQuantity = 0;
 			let longTermFundAmount = 0;
 			let shortTermFundQuantity = 0;
 			let shortTermFundAmount = 0;
-			for (var i = 0; i < fundIsinList.length; i++) {
-				if (todayDate - new Date(fundIsinList[i]["trade_date"]) > 1000 * 60 * 60 * 24 * 365) {
-					longTermFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
-					longTermFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
+			for (var i = 0; i < fundOrderList.length; i++) {
+				if (todayDate - new Date(fundOrderList[i]["trade_date"]) > 1000 * 60 * 60 * 24 * 365) {
+					longTermFundQuantity += parseFloat(fundOrderList[i]["quantity"]);
+					longTermFundAmount += fundOrderList[i]["quantity"] * fundOrderList[i]["price"];
 				} else {
-					shortTermFundQuantity += parseFloat(fundIsinList[i]["quantity"]);
-					shortTermFundAmount += fundIsinList[i]["quantity"] * fundIsinList[i]["price"];
+					shortTermFundQuantity += parseFloat(fundOrderList[i]["quantity"]);
+					shortTermFundAmount += fundOrderList[i]["quantity"] * fundOrderList[i]["price"];
 				}
 			}
 			
@@ -116,16 +155,21 @@ function fdComparison(roi) {
 		let totalSimpleInterest = 0;
 		let totalCompoundInterest = 0;
 		const todayDate = Utils.getNewDate();
-		GSHEET_DATA.forEach(function(obj) {
-			let principle = parseFloat(obj.quantity) * parseFloat(obj.price);
-			let tradeDate = new Date(obj.trade_date);
-			tradeDate.setUTCHours(tradeDate.getUTCHours() + 5, 30, 0, 0);
-			let yearsHeld = (todayDate - tradeDate) / (1000 * 60 * 60 * 24 * 365);
-			let simpleInterest = Utils.calculateSimpleInterest(principle, roi, yearsHeld);
-			let compoundInterest = Utils.calculateCompoundInterest(principle, roi, yearsHeld, 4);
-			totalSimpleInterest += simpleInterest;
-			totalCompoundInterest += compoundInterest;
-			totalPrinciple += principle;
+		Object.keys(FILTERED_FUND_WISE_DATA).forEach(function(isin) {
+			let fundObj = FILTERED_FUND_WISE_DATA[isin];
+			for (let i = 0; i < fundObj["orderList"].length; i++) {
+				const txn = fundObj["orderList"][i];
+
+				let principle = parseFloat(txn.quantity) * parseFloat(txn.price);
+				let tradeDate = new Date(txn.trade_date);
+				tradeDate.setUTCHours(tradeDate.getUTCHours() + 5, 30, 0, 0);
+				let yearsHeld = (todayDate - tradeDate) / (1000 * 60 * 60 * 24 * 365);
+				let simpleInterest = Utils.calculateSimpleInterest(principle, roi, yearsHeld);
+				let compoundInterest = Utils.calculateCompoundInterest(principle, roi, yearsHeld, 4);
+				totalSimpleInterest += simpleInterest;
+				totalCompoundInterest += compoundInterest;
+				totalPrinciple += principle;
+			}
 		});
 		const response = {
 			"totalSimpleInterest": totalSimpleInterest.toFixed(2),
@@ -167,6 +211,7 @@ function getV2Ltst() {
 module.exports = {
 	get_GSHEET_DATA,
 	get_FUND_WISE_DATA,
+	get_FILTERED_FUND_WISE_DATA,
 	get_LONG_TERM_FUND_SUM_DATA,
 	get_SHORT_TERM_FUND_SUM_DATA,
 	get_LTST_FUND_SUM_DATA,

@@ -34,11 +34,33 @@ function getNewDate() {
 	return todayDate;
 }
 
+function deepClone(obj) {
+	if (obj === null || typeof obj !== "object") {
+		return obj;
+	}
+
+	if (obj instanceof Date) {
+		return new Date(obj);
+	}
+	if (Array.isArray(obj)) {
+		return obj.map(deepClone);
+	}
+
+	const clonedObj = {};
+	for (let key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			clonedObj[key] = deepClone(obj[key]);
+		}
+	}
+	return clonedObj;
+}
+  
 
 module.exports = {
 	isNumeric,
 	calculateSimpleInterest,
 	calculateCompoundInterest,
 	gsheetRows2Objects,
-	getNewDate
+	getNewDate,
+	deepClone
 };
