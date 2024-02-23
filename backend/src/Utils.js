@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 function isNumeric(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
 }
@@ -54,7 +56,11 @@ function deepClone(obj) {
 	}
 	return clonedObj;
 }
-  
+
+async function axiosApiCall(url) {
+	const response = await axios.get(url);
+	return response;
+}
 
 module.exports = {
 	isNumeric,
@@ -62,5 +68,6 @@ module.exports = {
 	calculateCompoundInterest,
 	gsheetRows2Objects,
 	getNewDate,
-	deepClone
+	deepClone,
+	axiosApiCall
 };

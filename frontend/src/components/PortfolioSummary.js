@@ -46,8 +46,8 @@ function PortfolioSummary({ roi, fdComparison, setFdComparison, ltstSummary, set
 					header={[]}
 				/>
 			}
-			</div>
-			<div className="summaryTables">
+		</div>
+		<div className="summaryTables">
 			<div className="tabHeading">LTST <Reload onClick={getLtStComparisonAPI}/></div>
 			{(ltstSummary) && 
 				<Table
@@ -63,7 +63,7 @@ function PortfolioSummary({ roi, fdComparison, setFdComparison, ltstSummary, set
 					header={[]}
 				/>
 			}
-			</div>
+		</div>
 		</>
 	);
 }

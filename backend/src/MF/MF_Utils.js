@@ -36,7 +36,7 @@ function get_LTST_FUND_SUM_DATA() {
 
 async function initializeMFExpressServer() {
 	await initialize_GSHEET_DATA();
-	initialize_FUND_WISE_DATA();
+	await initialize_FUND_WISE_DATA();
 	initialize_FILTERED_FUND_WISE_DATA();
 	initialize_LS_TERM_FUND_SUM_DATA();
 }
@@ -56,14 +56,17 @@ async function initialize_GSHEET_DATA() {
 	// console.log(GSHEET_DATA);
 }
 
-function initialize_FUND_WISE_DATA() {
+async function initialize_FUND_WISE_DATA() {
 	FUND_WISE_DATA = {};
 	try {
 		for (let i = 0; i < GSHEET_DATA.length; i++) {
 			if (FUND_WISE_DATA.hasOwnProperty(GSHEET_DATA[i]["isin"])) {
 				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]]["orderList"] = FUND_WISE_DATA[GSHEET_DATA[i]["isin"]]["orderList"].concat(GSHEET_DATA[i]);
 			} else {
-				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]] = {"orderList" : [GSHEET_DATA[i]]};
+				let response = await Utils.axiosApiCall("https://mf.captnemo.in/kuvera/" + GSHEET_DATA[i]["isin"])
+                const kuveraApiData = response.data;
+                const currentNav = kuveraApiData[0].nav.nav;
+				FUND_WISE_DATA[GSHEET_DATA[i]["isin"]] = {"currentNav" : currentNav, "orderList" : [GSHEET_DATA[i]]};
 			}
 		}
 	} catch (e) {
@@ -187,12 +190,15 @@ function getV2Ltst() {
 
 	Object.keys(LTST_FUND_SUM_DATA).forEach(function(isin) {
 		const fundObj = LTST_FUND_SUM_DATA[isin];
+		const currentNav = FUND_WISE_DATA[isin]["currentNav"];
 		tableRows.push([
 			fundObj.symbol,
 			fundObj.longTermFundQuantity,
 			fundObj.longTermFundAmount,
+			(parseFloat(fundObj.longTermFundQuantity) * parseFloat(currentNav)) - fundObj.longTermFundAmount,
 			fundObj.shortTermFundQuantity,
-			fundObj.shortTermFundAmount
+			fundObj.shortTermFundAmount,
+			(parseFloat(fundObj.shortTermFundQuantity) * parseFloat(currentNav)) - fundObj.shortTermFundAmount
 		])
 	});
 
