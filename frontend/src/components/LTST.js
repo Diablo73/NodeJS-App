@@ -58,8 +58,8 @@ function LTST({}) {
 			<Table
 				pageSize={1}
 				noPagination={true}
-				style={{width:"1500px"}}
-				columnsConfig="400px 100px 150px 250px 100px 150px 250px"
+				style={{width:"1350px"}}
+				columnsConfig="400px 100px 150px 180px 100px 150px 180px"
 				data={ltstFundTable}
 				header={["FUND", "LONG-TERM QUANTITY", "LONG-TERM AMOUNT", "LONG-TERM PROFIT", "SHORT-TERM QUANTITY", "SHORT-TERM AMOUNT", "SHORT-TERM PROFIT"]}
 			>
