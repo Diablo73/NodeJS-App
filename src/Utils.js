@@ -57,9 +57,14 @@ function deepClone(obj) {
 	return clonedObj;
 }
 
-async function axiosApiCall(url) {
+// async function axiosApiCall(url) {
+// 	const response = await axios.get(url);
+// 	return response;
+// }
+
+const axiosApiCall = async (url) => {
 	const response = await axios.get(url);
-	return response;
+	return response
 }
 
 module.exports = {

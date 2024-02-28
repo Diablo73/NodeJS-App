@@ -21,5 +21,5 @@ app.listen(port, () => {
 
 
 app.get("/", (req, res) => {
-	res.send("If you are seeing this message, then it means that the backend NodeJS server is up and running.<br>Please wait for some time while the frontend ReactJS server boots up...");
+	res.send("The backend NodeJS server is up and running.");
 });

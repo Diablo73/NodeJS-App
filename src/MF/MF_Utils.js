@@ -1,8 +1,8 @@
 const axios = require("axios");
 const Utils = require("../Utils");
 
-const YEARS = ["2021-22", "2022-23", "2023-24"];
-// const YEARS = ["2021-22"];
+// const YEARS = ["2021-22", "2022-23", "2023-24"];
+const YEARS = ["2021-22"];
 let GSHEET_DATA = [];
 let FUND_WISE_DATA = {};
 let FILTERED_FUND_WISE_DATA = {};
@@ -34,26 +34,31 @@ function get_LTST_FUND_SUM_DATA() {
 	return LTST_FUND_SUM_DATA;
 }
 
-async function initializeMFExpressServer() {
+const initializeMFExpressServer = async () => {
 	await initialize_GSHEET_DATA();
-	await initialize_FUND_WISE_DATA();
-	initialize_FILTERED_FUND_WISE_DATA();
-	initialize_LS_TERM_FUND_SUM_DATA();
+	// await initialize_FUND_WISE_DATA();
+	// initialize_FILTERED_FUND_WISE_DATA();
+	// initialize_LS_TERM_FUND_SUM_DATA();
 }
 
 async function initialize_GSHEET_DATA() {
 	GSHEET_DATA = [];
 	let csvData;
+
 	try {
 		for (let i = 0; i < YEARS.length; i++) {
-			csvData = await axios.get("https://sheets.googleapis.com/v4/spreadsheets/" + process.env.GSHEET_ID + "/values/" + YEARS[i] + "?alt=json&key=" + process.env.GSHEET_API_KEY);
+			csvData = await axios.get("https://script.google.com/macros/s/" + process.env.MF_GAS_URL_ID + "/exec?path=getDataAsJSON&sheet=" + YEARS[i]);
+			console.log(csvData);
+			// csvData = await axios.get("https://opensheet.elk.sh/" + process.env.GSHEET_ID + "/" + YEARS[i]);
+			// csvData = await axios.get("https://sheets.googleapis.com/v4/spreadsheets/" + process.env.GSHEET_ID + "/values/" + YEARS[i] + "?alt=json&key=" + process.env.GSHEET_API_KEY);
 			// csvData = await axios.get("http://localhost:8080/api/MF");
-			GSHEET_DATA = GSHEET_DATA.concat(Utils.gsheetRows2Objects(csvData.data.values));
+			// GSHEET_DATA = GSHEET_DATA.concat(Utils.gsheetRows2Objects(csvData.data.values));
+			GSHEET_DATA = GSHEET_DATA.concat(csvData.data.values);
 		}
 	} catch (e) {
 		console.log(e);
 	}
-	// console.log(GSHEET_DATA);
+	console.log(GSHEET_DATA);
 }
 
 async function initialize_FUND_WISE_DATA() {
